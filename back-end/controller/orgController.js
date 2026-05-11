@@ -1,5 +1,45 @@
-const orgSchema = require("../model/organization")
+const jwt = require("jsonwebtoken")
+const orgSchema = require("../model/organization");
 
+// login
+const superAdminLogin = async(req, res)=>{
+    try{
+    const {username, password } = req.body;
+
+    if (!username || !password)
+       return  res.status(400).json({message: "Please fill all the fields"})
+
+    if(username !== process.env.SUPER_ADMIN_USER_NAME || password !== process.env.SUPER_ADMIN_USER_PASS)
+        return  res.status(400).json({message: "Incorrect username or password"})
+
+    // generating jwt token
+    const payload = {
+        user:{username},
+        role:"admin"
+    }
+    const secret = process.env.SECRET_KEY
+    const token = jwt.sign(
+        payload,
+        secret,
+        {expiresIn:"1d"}
+     );
+
+     // sending jwt
+    res.cookie("token", token,{
+        httpOnly:true,
+        maxAge:24 * 60 * 60 * 1000,
+        sameSite: "lax",
+        secure: false    
+    })
+    return  res.status(200).json({message: "Your logged in"});
+    }
+
+    catch{
+        res.status(500).json({message: "login failed"});
+    }
+}
+
+// CRUD
 const getOrg = async (req, res)=>{
     try{
         const db = await orgSchema.find();
@@ -49,4 +89,4 @@ const deleteOrg = async (req, res)=>{
     }
 }
 
-module.exports = {getOrg, postOrg, editOrg, deleteOrg}
+module.exports = {getOrg, postOrg, editOrg, deleteOrg, superAdminLogin}
