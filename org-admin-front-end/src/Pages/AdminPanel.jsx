@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 function AdminPanel() {
     const [feature, setFeature] = useState([])
-    const [newFeature, setNewFeature] = useState([])
+    const [newFeature, setNewFeature] = useState('')
     const [isFeatureEnabled, setIsFeatureEnabled] = useState(false);
     const [editId, setEditId] = useState(null)
     const [editFeature, setEditFeature] = useState("")
@@ -28,10 +28,10 @@ function AdminPanel() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ key: newFeature, isEnabled: isFeatureEnabled })
+            body: JSON.stringify({ feature_key: newFeature, isEnabled: isFeatureEnabled })
         });
         setNewFeature("")
-       
+       getFeatures();
     
     }
 
@@ -41,7 +41,7 @@ function AdminPanel() {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ name: editFeature })
+            body: JSON.stringify({ feature_key: editFeature })
         })
         setEditId(null);
         setEditFeature("");
@@ -54,6 +54,19 @@ function AdminPanel() {
             method: "DELETE",
             credentials: "include"
         })
+        getFeatures();
+    }
+
+    // feature enable
+    const featureEnable = async (id) => {
+        await fetch(`${API}/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ isEnabled: !isFeatureEnabled })
+        })
+        console.log("is feature enabled "+!isFeatureEnabled)
+        setIsFeatureEnabled(!isFeatureEnabled);
         getFeatures();
     }
 
@@ -87,13 +100,13 @@ function AdminPanel() {
                             </>
                         ) : (
                             <>
-                                <p>{ft.name}</p>
+                                <p>{ft.feature_key}</p>
                                 <button onClick={() => {
                                     setEditId(ft._id)
-                                    setEditFeature(ft.name)
+                                    setEditFeature(ft.feature_key)
                                 }} className="edBtn">Edit</button>
                                 <button onClick={() => deleteFeature(ft._id)} className="dlBtn">Delete</button>
-                                <button onClick={() => setIsFeatureEnabled(!isFeatureEnabled)} className="enBtn">
+                                <button onClick={() => featureEnable(ft._id)} className="enBtn">
                                     {isFeatureEnabled ? "Disable" : "Enable"}
                                 </button>
                             </>

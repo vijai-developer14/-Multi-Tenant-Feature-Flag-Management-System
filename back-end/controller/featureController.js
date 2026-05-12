@@ -14,8 +14,12 @@ const getFeature = async (req, res)=>{
 
 const postFeature = async (req, res)=>{
     try{
-        const orgData = req.body;
-        const db = new featureSchema(orgData);
+        const {feature_key} = req.body;
+        const orgId = req.user.orgId;
+        const db = new featureSchema({
+            feature_key: feature_key,
+            orgId: orgId
+        });
         const result = db.save();
         res.status(200).json(result);
         console.log("posting feature data")
@@ -27,9 +31,9 @@ const postFeature = async (req, res)=>{
 
 const editFeature = async (req, res)=>{
     try{
-        const orgData = req.body;
-        const id = req.params.orgId;
-        const db = await featureSchema.findByIdAndUpdate(id, {$set: orgData}, {new: true});
+        const featureData = req.body;
+        const id = req.params.featureId;
+        const db = await featureSchema.findByIdAndUpdate(id, {$set: featureData}, {new: true});
         res.status(200).json(db);
         console.log("patching feature")
     }
@@ -40,7 +44,7 @@ const editFeature = async (req, res)=>{
 
 const deleteFeature = async (req, res)=>{
     try{
-        const id = req.params.orgId;
+        const id = req.params.featureId;
         const db = await featureSchema.findByIdAndDelete(id);
         res.status(200).json(db);
         console.log(" deleting feature")

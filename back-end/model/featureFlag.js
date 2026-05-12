@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const featureSchema =  new mongoose.Schema({
-    key: { 
+    feature_key: { 
         type: String,
         required: true 
     },
