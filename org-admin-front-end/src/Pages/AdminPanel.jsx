@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 function AdminPanel() {
     const [feature, setFeature] = useState([])
     const [newFeature, setNewFeature] = useState('')
-    const [isFeatureEnabled, setIsFeatureEnabled] = useState(false);
     const [editId, setEditId] = useState(null)
     const [editFeature, setEditFeature] = useState("")
 
@@ -28,7 +27,7 @@ function AdminPanel() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ feature_key: newFeature, isEnabled: isFeatureEnabled })
+            body: JSON.stringify({ feature_key: newFeature })
         });
         setNewFeature("")
        getFeatures();
@@ -58,15 +57,14 @@ function AdminPanel() {
     }
 
     // feature enable
-    const featureEnable = async (id) => {
+    const featureEnable = async (id, currentStatus) => {
         await fetch(`${API}/${id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ isEnabled: !isFeatureEnabled })
+            body: JSON.stringify({ isEnabled: !currentStatus })
         })
-        console.log("is feature enabled "+!isFeatureEnabled)
-        setIsFeatureEnabled(!isFeatureEnabled);
+        console.log("is feature enabled "+!currentStatus)
         getFeatures();
     }
 
@@ -74,7 +72,8 @@ function AdminPanel() {
         <div className="superAdminBg">
             <h1>Super Admin Panel</h1>
 
-            <form onSubmit={createFeature}>
+            <form onSubmit={createFeature} style={{display:"flex", alignItems:"center", justifyContent:"center",
+            gap: "14px"}}>
                 <input
                     type="text"
                     placeholder="Feature Key"
@@ -82,7 +81,7 @@ function AdminPanel() {
                     onChange={(e) => setNewFeature(e.target.value)}
                     required
                 />
-                <button type="submit">Create</button>
+                <button type="submit" className="createBtn">Create</button>
             </form>
 
             <ul>
@@ -106,8 +105,11 @@ function AdminPanel() {
                                     setEditFeature(ft.feature_key)
                                 }} className="edBtn">Edit</button>
                                 <button onClick={() => deleteFeature(ft._id)} className="dlBtn">Delete</button>
-                                <button onClick={() => featureEnable(ft._id)} className="enBtn">
-                                    {isFeatureEnabled ? "Disable" : "Enable"}
+                                <button onClick={() => featureEnable(ft._id, ft.isEnabled)} 
+                                className="enBtn"
+                                style={{backgroundColor:ft.isEnabled ? 'red' : 'blue'}}
+                                >
+                                    {ft.isEnabled ? "Disable" : "Enable"}
                                 </button>
                             </>
                         )}
