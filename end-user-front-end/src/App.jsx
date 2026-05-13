@@ -6,7 +6,7 @@ function App() {
   const [featureLists , setFeatureLists] = useState([]);
   const [companyId, setCompanyId] = useState("");
   const [featureId, setFeatureId] = useState("");
-  const [featureMessage, setFeatureMessage] =useState("");
+  const [featureMessage, setFeatureMessage] =useState();
 
   const getCompany = async ()=>{
     const API = "http://localhost:5000/api/organizations/public"
@@ -48,7 +48,7 @@ function App() {
       console.log("end user response not ok")
     }
     const result = await response.json();
-    setFeatureMessage(result)
+    setFeatureMessage(result.message)
     // console.log(result)
     // console.log(featureId, companyId)
   }
@@ -73,12 +73,17 @@ function App() {
           }
         </select>
           {
-          
+            
             featureLists.map((feature)=>(
-            <div key={feature._id} className='checkbxBg'>
+              feature.orgId === companyId && 
+            (<div key={feature._id} className='checkbxBg'>
               <label htmlFor="checkbox">{feature.feature_key}</label>
               <input type="checkbox" id="checkbox" value={feature._id} onChange={(e)=>setFeatureId(e.target.value)}/>
-            </div>
+            </div>)
+
+            
+            
+            
             )) 
             
           }
@@ -86,9 +91,9 @@ function App() {
       
       </form>
       {
-      featureMessage && (
-      <p>{featureMessage}</p>
-    )
+      featureMessage ? 
+      <p>{featureMessage}</p> : null
+    
       }
     </>
   )
