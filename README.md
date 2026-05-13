@@ -24,7 +24,8 @@ Clone the repo
 1. cd super-admin-front-end && npm install , cd org-admin-front-end && npm install, cd end-user-front-end && npm install
 2. npm run dev
 
-
+## Flow
+![Design](image.png)
 
 ## Pattern — MVC (Model View Controller)
 
