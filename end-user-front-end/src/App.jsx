@@ -4,6 +4,9 @@ import './App.css'
 function App() {
   const [companyList , setCompanyList] = useState([]);
   const [featureLists , setFeatureLists] = useState([]);
+  const [companyId, setCompanyId] = useState("");
+  const [featureId, setFeatureId] = useState("");
+  const [featureMessage, setFeatureMessage] =useState("");
 
   const getCompany = async ()=>{
     const API = "http://localhost:5000/api/organizations/public"
@@ -14,7 +17,7 @@ function App() {
     
     if(!response.ok) {console.error("error while getting company list")}
     const data = await response.json();
-    console.log(data)
+    // console.log(data)
     setCompanyList(data);
     
   }
@@ -28,11 +31,26 @@ function App() {
     
     if(!response.ok) {console.error("error while getting feature list")}
     const data = await response.json();
-    console.log(data)
+    // console.log(data)
     setFeatureLists(data);
   }
-  const checkFeature = () => {
-    
+
+  // check feature is available or not
+  const checkFeature = async (e) => {
+    e.preventDefault();
+    const API = "http://localhost:5000/users/end-user"
+    const response = await fetch(API,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({featureId: featureId, orgId: companyId})
+    })
+    if(!response.ok){
+      console.log("end user response not ok")
+    }
+    const result = await response.json();
+    setFeatureMessage(result)
+    // console.log(result)
+    // console.log(featureId, companyId)
   }
 
   useEffect(()=>{
@@ -42,13 +60,14 @@ function App() {
 
     return (
     <>
-      <form action="">
-        <select name="" id="">
+    <h2>Check Feature</h2>
+      <form action="" onSubmit={checkFeature}>
+        <select name="" id="" onChange={(e)=>setCompanyId(e.target.value)}>
           <option value="">Select Company</option>
           {
           
             companyList.map((company)=>(
-              <option value={company._id}>{company.name}</option>
+              <option value={company._id} >{company.name}</option>
             )) 
             
           }
@@ -56,16 +75,21 @@ function App() {
           {
           
             featureLists.map((feature)=>(
-            <div>
+            <div key={feature._id} className='checkbxBg'>
               <label htmlFor="checkbox">{feature.feature_key}</label>
-              <input type="checkbox" id="checkbox"/>
+              <input type="checkbox" id="checkbox" value={feature._id} onChange={(e)=>setFeatureId(e.target.value)}/>
             </div>
             )) 
             
           }
-        
+          <button type="submit">Check</button>
       
       </form>
+      {
+      featureMessage && (
+      <p>{featureMessage}</p>
+    )
+      }
     </>
   )
 }

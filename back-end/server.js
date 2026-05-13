@@ -8,6 +8,7 @@ const dbConnect = require("./config/db");
 const orgRoutes = require("./routes/orgRoutes")
 const userRoutes = require("./routes/userRoutes")
 const featureRoutes = require("./routes/featureRoutes")
+const endUserRouter = require("./routes/endUserRouter")
 
 
 const app = express();
@@ -28,6 +29,7 @@ dbConnect();
 app.use("/api", orgRoutes);
 app.use("/user", userRoutes);
 app.use("/feature-flags", featureRoutes);
+app.use("/users", endUserRouter);
 
 app.listen(`${process.env.PORT}`,()=>{
     console.log("app connected to" + ` ${process.env.PORT}`)
